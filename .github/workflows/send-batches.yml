@@ -1,0 +1,27 @@
+name: Trigger SMM Batch Sender
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright
+          npx playwright install --with-deps chromium
+
+      - name: Visit send_batches.php with a real browser
+        env:
+          TARGET_URL: ${{ secrets.SEND_BATCHES_URL }}
+        run: node trigger.js
